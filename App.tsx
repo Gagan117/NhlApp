@@ -36,6 +36,7 @@ const ScoreProvider = ({children}) => {
   );
 };
 
+//page
 const Home = ({ navigation }) => {
   const {scoresData} = useContext(ScoreContext);
 
@@ -52,7 +53,6 @@ const Home = ({ navigation }) => {
       <Text style={styles.textStyle}>Scores for {month}/{date}/{year}</Text>
       {scoresData.games.map((game, index)=> (
         <View key={index} style={styles.teamCard}>
-          <Text>{game.id}</Text>
           <View style={styles.teamCardDisplay}>
             <View style={styles.teamInfo}>
               <SvgUri
@@ -87,6 +87,84 @@ const Home = ({ navigation }) => {
   );
 };
 
+const Event = ({ typeDescKey, gameEvent }) => {
+  switch (typeDescKey){
+    case 'faceoff':
+      return(
+        <View style={styles.eventBoxSmall}>
+          <View style={{ flex: 1, alignItems: 'center'}}>
+            <PlayerDetails playerId={gameEvent.details.winningPlayerId} />
+          </View>
+          <View style={{ flex: 1, alignItems: 'center'}}>
+            <Text style={styles.eventMainText}>Period: {gameEvent.periodDescriptor.number}</Text>
+            <Text style={styles.eventMainText}>{gameEvent.timeRemaining}</Text>
+          </View>
+          <View style={{ flex: 1, alignItems: 'center'}}>
+            <Text style={styles.eventMainText}>{gameEvent.typeDescKey} Win</Text>
+          </View>
+        </View>
+      );
+    case 'hit':
+      return (
+        <View style={styles.eventBoxSmall}>
+          <View style={{ flex: 1, alignItems: 'center'}}>
+            <PlayerDetails playerId={gameEvent.details.hittingPlayerId} />
+          </View>
+          <View style={{ flex: 1, alignItems: 'center'}}>
+            <Text style={styles.eventMainText}>Period: {gameEvent.periodDescriptor.number}</Text>
+            <Text style={styles.eventMainText}>{gameEvent.timeRemaining}</Text>
+          </View>
+          <View style={{ flex: 1, alignItems: 'center'}}>
+            <Text style={styles.eventMainText}>{gameEvent.typeDescKey}</Text>
+          </View>
+        </View>
+      );
+    case 'blocked-shot':
+      return(
+        <View style={styles.eventBoxSmall}>
+          <View style={{ flex: 1, alignItems: 'center'}}>
+            <PlayerDetails playerId={gameEvent.details.blockingPlayerId} />
+          </View>
+          <View style={{ flex: 1, alignItems: 'center'}}>
+            <Text style={styles.eventMainText}>Period: {gameEvent.periodDescriptor.number}</Text>
+            <Text style={styles.eventMainText}>{gameEvent.timeRemaining}</Text>
+          </View>
+          <View style={{ flex: 1, alignItems: 'center'}}>
+            <Text style={styles.eventMainText}>{gameEvent.typeDescKey}</Text>
+          </View>
+        </View>
+      );
+    case 'missed-shot':
+      return(
+        <View style={styles.eventBoxSmall}>
+          <View style={{ flex: 1, alignItems: 'center'}}>
+            <PlayerDetails playerId={gameEvent.details.shootingPlayerId} />
+          </View>
+          <View style={{ flex: 1, alignItems: 'center'}}>
+            <Text style={styles.eventMainText}>Period: {gameEvent.periodDescriptor.number}</Text>
+            <Text style={styles.eventMainText}>{gameEvent.timeRemaining}</Text>
+          </View>
+          <View style={{ flex: 1, alignItems: 'center'}}>
+            <Text style={styles.eventMainText}>{gameEvent.typeDescKey}</Text>
+            <Text>Type of Shot: {gameEvent.details.shotType}</Text>
+          </View>
+        </View>
+      );
+    default:
+      return(
+        <View style={styles.eventBoxSmall}>
+          <View>
+            <Text style={styles.eventMainText}>Period: {gameEvent.periodDescriptor.number}</Text>
+            <Text style={styles.eventMainText}>{gameEvent.timeRemaining}</Text>
+          </View>
+          <Text>Event: {gameEvent.typeDescKey}</Text>
+          <Text>ADD IN</Text>
+        </View>
+      );
+  }
+};
+
+//page
 const GameDetails = ({ route }) => {
   const { game } = route.params;
   const[gameData, setGameData] = useState(null);
@@ -115,13 +193,43 @@ const GameDetails = ({ route }) => {
       <Text>{gameData.gameDate}</Text>
       <ScrollView>
         {gameData.plays.map((gameEvent, index) => (
-          <View key={index}>
-              <Text>{gameEvent.typeDescKey}</Text>
+          <View key={index} style={styles.eventBox}>
+            <Event typeDescKey={gameEvent.typeDescKey} gameEvent={gameEvent}/>
           </View>
         ))}
       </ScrollView>
     </View>
   );
+};
+
+const PlayerDetails = ({ playerId }) => {
+  const[playerInfo, setPlayerInfo] = useState(null);
+
+  useEffect(() => {
+    const fetchPlayerInfo = async () => {
+      try{
+        const response = await fetch(`https://api-web.nhle.com/v1/player/${playerId}/landing`);
+        const data = await response.json();
+        setPlayerInfo(data);
+      }
+      catch (e){
+        console.error(e.message);
+      }
+    };
+
+    fetchPlayerInfo();
+  }, [playerId]);
+
+  if(!playerInfo){
+    return <Text>Loading...</Text>;
+  }
+
+  return(
+    <View>
+      <Image style={styles.eventImage} src={playerInfo.headshot} height={50} width={50}/>
+      <Text>{playerInfo.firstName.default}, {playerInfo.lastName.default}</Text>
+    </View>
+  )
 };
 
 const Stack = createStackNavigator();
@@ -169,6 +277,29 @@ const styles = StyleSheet.create({
   },
   teamScore: {
     marginRight: 10,
+  },
+  // event page
+  eventBox: {
+    borderWidth: 1,
+    borderRadius: 10,
+    margin: 5,
+  },
+  eventBoxSmall: {
+    width: '100%',
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems:'center',
+    minHeight: 100,
+    padding: 10,
+  },
+  eventImage: {
+    borderRadius: 40,
+    height: 50,
+    width: 50,
+  },
+  eventMainText:{
+    fontSize: 18,
+    fontWeight: 'semibold',
   },
 });
 
