@@ -1,5 +1,7 @@
 import * as React from 'react';
-import {ScrollView, StyleSheet, Text, View} from 'react-native';
+import {Image, ScrollView, StyleSheet, Text, View} from 'react-native';
+//https://github.com/software-mansion/react-native-svg?tab=readme-ov-file#installation
+import {SvgUri} from 'react-native-svg';
 import {useEffect, useState} from 'react';
 
 
@@ -33,16 +35,41 @@ const Home = () => {
     return <Text>Loading...</Text>;
   }
 
+  var date = new Date().getDate();
+  var month = new Date().getMonth();
+  var year = new Date().getFullYear();
+
   return(
     <ScrollView>
-      <Text>Scores for today</Text>
+      <Text style={styles.textStyle}>Scores for {month}/{date}/{year}</Text>
       {scoresData.games.map((game, index)=> (
-        <View key={index}>
-          <View style={styles.teamCard}>
-            <Text>{game.awayTeam.name.default}</Text>
+        <View key={index} style={styles.teamCard}>
+          <View style={styles.teamCardDisplay}>
+            <View style={styles.teamInfo}>
+              <SvgUri
+                height={50}
+                width={50}
+                uri = {game.awayTeam.logo}
+              />
+              <Text style={styles.textStyle}>{game.awayTeam.name.default}</Text>
+            </View>
+            <View style={styles.teamScore}>
+              <Text style={styles.textStyle}>{game.awayTeam.score}</Text>
+            </View>
           </View>
-          <View style={styles.teamCard}>
-            <Text>{game.homeTeam.name.default}</Text>
+
+          <View style={styles.teamCardDisplay}>
+            <View style={styles.teamInfo}>
+              <SvgUri
+                height={50}
+                width={50}
+                uri = {game.homeTeam.logo}
+              />
+              <Text style={styles.textStyle}>{game.homeTeam.name.default}</Text>
+            </View>
+            <View style={styles.teamScore}>
+              <Text style={styles.textStyle}>{game.homeTeam.score}</Text>
+            </View>
           </View>
         </View>
       ))}
@@ -60,11 +87,31 @@ const App = () => {
 
 const styles = StyleSheet.create({
   teamCard: {
-    height: 200,
-    width: 100,
+    width: '90%',
+    alignSelf:'center',
+    margin: 'auto',
     backgroundColor: 'light-gray',
     borderWidth: 1,
     borderColor: 'black',
+  },
+  teamCardDisplay: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    width: '100%',
+  },
+  teamInfo:{
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  textStyle: {
+    fontSize: 20,
+    textAlign: 'center',
+    margin: 'auto',
+    fontWeight: 'bold',
+  },
+  teamScore: {
+    marginRight: 10,
   },
 });
 
