@@ -1,130 +1,70 @@
-/**
- * Sample React Native App
- * https://github.com/facebook/react-native
- *
- * @format
- */
+import * as React from 'react';
+import {ScrollView, StyleSheet, Text, View} from 'react-native';
+import {useEffect, useState} from 'react';
 
-import React from 'react';
-import type {PropsWithChildren} from 'react';
-import {
-  ScrollView,
-  StatusBar,
-  StyleSheet,
-  Text,
-  useColorScheme,
-  View,
-} from 'react-native';
 
-import {
-  Colors,
-  DebugInstructions,
-  Header,
-  LearnMoreLinks,
-  ReloadInstructions,
-} from 'react-native/Libraries/NewAppScreen';
 
-type SectionProps = PropsWithChildren<{
-  title: string;
-}>;
+const Home = () => {
+  const[scoresData, setScoresData] = useState(null);
+  const[error, setError] = useState(null);
 
-function Section({children, title}: SectionProps): React.JSX.Element {
-  const isDarkMode = useColorScheme() === 'dark';
-  return (
-    <View style={styles.sectionContainer}>
-      <Text
-        style={[
-          styles.sectionTitle,
-          {
-            color: isDarkMode ? Colors.white : Colors.black,
-          },
-        ]}>
-        {title}
-      </Text>
-      <Text
-        style={[
-          styles.sectionDescription,
-          {
-            color: isDarkMode ? Colors.light : Colors.dark,
-          },
-        ]}>
-        {children}
-      </Text>
+  useEffect(() => {
+    const fetchData = async ()=> {
+      try {
+        const response = await fetch('https://api-web.nhle.com/v1/score/2025-05-02');
+        if(!response.ok){
+          throw new Error('Data no found');
+        }
+        const data = await response.json();
+        setScoresData(data);
+      }
+      catch(e){
+        setError(e.message);
+      }
+    };
+    fetchData();
+  }, []);
+
+  if (error) {
+    return <Text>Error: {error}</Text>;
+  }
+
+  if (!scoresData || !scoresData.games) {
+    return <Text>Loading...</Text>;
+  }
+
+  return(
+    <ScrollView>
+      <Text>Scores for today</Text>
+      {scoresData.games.map((game, index)=> (
+        <View key={index}>
+          <View style={styles.teamCard}>
+            <Text>{game.awayTeam.name.default}</Text>
+          </View>
+          <View style={styles.teamCard}>
+            <Text>{game.homeTeam.name.default}</Text>
+          </View>
+        </View>
+      ))}
+    </ScrollView>
+  );
+};
+
+const App = () => {
+  return(
+    <View>
+      <Home/>
     </View>
   );
-}
-
-function App(): React.JSX.Element {
-  const isDarkMode = useColorScheme() === 'dark';
-
-  const backgroundStyle = {
-    backgroundColor: isDarkMode ? Colors.darker : Colors.lighter,
-  };
-
-  /*
-   * To keep the template simple and small we're adding padding to prevent view
-   * from rendering under the System UI.
-   * For bigger apps the recommendation is to use `react-native-safe-area-context`:
-   * https://github.com/AppAndFlow/react-native-safe-area-context
-   *
-   * You can read more about it here:
-   * https://github.com/react-native-community/discussions-and-proposals/discussions/827
-   */
-  const safePadding = '5%';
-
-  return (
-    <View style={backgroundStyle}>
-      <StatusBar
-        barStyle={isDarkMode ? 'light-content' : 'dark-content'}
-        backgroundColor={backgroundStyle.backgroundColor}
-      />
-      <ScrollView
-        style={backgroundStyle}>
-        <View style={{paddingRight: safePadding}}>
-          <Header/>
-        </View>
-        <View
-          style={{
-            backgroundColor: isDarkMode ? Colors.black : Colors.white,
-            paddingHorizontal: safePadding,
-            paddingBottom: safePadding,
-          }}>
-          <Section title="Step One">
-            Edit <Text style={styles.highlight}>App.tsx</Text> to change this
-            screen and then come back to see your edits.
-          </Section>
-          <Section title="See Your Changes">
-            <ReloadInstructions />
-          </Section>
-          <Section title="Debug">
-            <DebugInstructions />
-          </Section>
-          <Section title="Learn More">
-            Read the docs to discover what to do next:
-          </Section>
-          <LearnMoreLinks />
-        </View>
-      </ScrollView>
-    </View>
-  );
-}
+};
 
 const styles = StyleSheet.create({
-  sectionContainer: {
-    marginTop: 32,
-    paddingHorizontal: 24,
-  },
-  sectionTitle: {
-    fontSize: 24,
-    fontWeight: '600',
-  },
-  sectionDescription: {
-    marginTop: 8,
-    fontSize: 18,
-    fontWeight: '400',
-  },
-  highlight: {
-    fontWeight: '700',
+  teamCard: {
+    height: 200,
+    width: 100,
+    backgroundColor: 'light-gray',
+    borderWidth: 1,
+    borderColor: 'black',
   },
 });
 
