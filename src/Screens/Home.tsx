@@ -1,5 +1,6 @@
-import {useContext, useEffect, useState} from 'react';
+import {useEffect, useState} from 'react';
 import {Button, ScrollView, StyleSheet, Text, View} from 'react-native';
+//https://github.com/software-mansion/react-native-svg?tab=readme-ov-file#installation
 import {SvgUri} from 'react-native-svg';
 import * as React from 'react';
 
