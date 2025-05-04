@@ -3,6 +3,7 @@ import {Button, ScrollView, StyleSheet, Text, View} from 'react-native';
 //https://github.com/software-mansion/react-native-svg?tab=readme-ov-file#installation
 import {SvgUri} from 'react-native-svg';
 import * as React from 'react';
+import GoalItem from '../components/GoalItem.tsx';
 
 const Home = ({ navigation }) => {
   const [scoresData, setScoresData] = useState(null);
@@ -10,7 +11,7 @@ const Home = ({ navigation }) => {
   useEffect(() => {
     const fetchScores = async () => {
       try {
-        const response = await fetch('https://api-web.nhle.com/v1/score/now'); // replace with your actual API
+        const response = await fetch('https://api-web.nhle.com/v1/score/2025-05-03'); // replace with your actual API
         const data = await response.json();
         setScoresData(data);
       } catch (error) {
@@ -61,6 +62,11 @@ const Home = ({ navigation }) => {
               <Text style={styles.textStyle}>{game.homeTeam.score}</Text>
             </View>
           </View>
+          <View>
+            {game.goals.map((goal, index) => (
+              <GoalItem goal={goal} key={index}/>
+            ))}
+          </View>
           <Button title="View Details" onPress={() => navigation.navigate('GameDetails', {game})}/>
         </View>
       ))}
@@ -75,7 +81,7 @@ const styles = StyleSheet.create({
   teamCard: {
     width: '90%',
     alignSelf:'center',
-    margin: 'auto',
+    margin: 5,
     backgroundColor: 'light-gray',
     borderWidth: 1,
     borderColor: 'black',
