@@ -13,7 +13,7 @@ const GoalItem = ({ goal }) => {
         <View style={styles.assistBox}>
           <Text>{goal.timeInPeriod} - </Text>
           {goal.assists.map((assist, index) => (
-            <Text>{assist.name.default}</Text>
+            <Text>{assist.name.default}, </Text>
           ))}
         </View>
       </View>

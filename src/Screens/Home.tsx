@@ -7,32 +7,48 @@ import GoalItem from '../components/GoalItem.tsx';
 
 const Home = ({ navigation }) => {
   const [scoresData, setScoresData] = useState(null);
+  const[day, setDay] = useState(new Date().getDate());
+
+  const year = new Date().getFullYear();
+  const month = new Date().getMonth()+1;
+  const paddedMonth = month < 10 ? `0${month}` : `${month}`;
+  const paddedDay = day < 10 ? `0${day}` : `${day}`;
+
+  const formattedDate = `${year}-${paddedMonth}-${paddedDay}`;
+
+  const fetchScores = async (selectedDate) => {
+    try {
+      const response = await fetch(`https://api-web.nhle.com/v1/score/${selectedDate}`);
+      const data = await response.json();
+      setScoresData(data);
+    } catch (error) {
+      console.error('Failed to fetch scores:', error);
+    }
+  };
 
   useEffect(() => {
-    const fetchScores = async () => {
-      try {
-        const response = await fetch('https://api-web.nhle.com/v1/score/2025-05-03'); // replace with your actual API
-        const data = await response.json();
-        setScoresData(data);
-      } catch (error) {
-        console.error('Failed to fetch scores:', error);
-      }
-    };
+    fetchScores(formattedDate);
+  }, [formattedDate]);
 
-    fetchScores();
-  }, []);
+  const increment = () => {
+    setDay(day+1);
+  };
+
+  const decrement = () => {
+    setDay(day-1);
+  };
 
   if (!scoresData || !scoresData.games) {
     return <Text>Loading...</Text>;
   }
 
-  var date = new Date().getDate();
-  var month = new Date().getMonth();
-  var year = new Date().getFullYear();
-
   return(
     <ScrollView>
-      <Text style={styles.textStyle}>Scores for {month}/{date}/{year}</Text>
+      <View style={styles.dateBox}>
+        <Button title="<" onPress={() => {decrement()}}></Button>
+        <Text style={styles.textStyle}>{formattedDate}</Text>
+        <Button title=">" onPress={() => {increment()}}></Button>
+      </View>
       {scoresData.games.map((game, index)=> (
         <View key={index} style={styles.teamCard}>
           <View style={styles.teamCardDisplay}>
@@ -63,7 +79,7 @@ const Home = ({ navigation }) => {
             </View>
           </View>
           <View>
-            {game.goals.map((goal, index) => (
+            {game.goals && game.goals.length > 0 && game.goals.map((goal, index) => (
               <GoalItem goal={goal} key={index}/>
             ))}
           </View>
@@ -77,6 +93,11 @@ const Home = ({ navigation }) => {
 const styles = StyleSheet.create({
   scrollPage: {
     backgroundColor: 'black',
+  },
+  dateBox: {
+    width: '90%',
+    flexDirection: 'row',
+    alignSelf: 'center',
   },
   teamCard: {
     width: '90%',
