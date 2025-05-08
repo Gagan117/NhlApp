@@ -43,7 +43,7 @@ const BoxScore = ({ game }) => {
             <Text style={styles.cell}>TOI</Text>
             <Text style={styles.cell}>PPG</Text>
           </View>
-          {currentTeam === 'away' && gameData.playerByGameStats.awayTeam.forwards.map((player, index) => (
+          {currentTeam === 'away' && gameData.playerByGameStats?.awayTeam?.forwards?.map((player, index) => (
             <View key={index}>
               <View style={styles.table}>
                 <Text style={[styles.cell, styles.nameCell]}>{player.name.default}</Text>
@@ -58,7 +58,7 @@ const BoxScore = ({ game }) => {
               </View>
             </View>
           ))}
-          {currentTeam === 'away' && gameData.playerByGameStats.awayTeam.defense.map((player, index) => (
+          {currentTeam === 'away' && gameData.playerByGameStats?.awayTeam?.defense?.map((player, index) => (
             <View key={index}>
               <View style={styles.table}>
                 <Text style={[styles.cell, styles.nameCell]}>{player.name.default}</Text>
@@ -74,7 +74,7 @@ const BoxScore = ({ game }) => {
             </View>
           ))}
 
-          {currentTeam === 'home' && gameData.playerByGameStats.homeTeam.forwards.map((player, index) => (
+          {currentTeam === 'home' && gameData.playerByGameStats?.homeTeam?.forwards?.map((player, index) => (
             <View key={index}>
               <View style={styles.table}>
                 <Text style={[styles.cell, styles.nameCell]}>{player.name.default}</Text>
@@ -89,7 +89,7 @@ const BoxScore = ({ game }) => {
               </View>
             </View>
           ))}
-          {currentTeam === 'home' && gameData.playerByGameStats.homeTeam.defense.map((player, index) => (
+          {currentTeam === 'home' && gameData.playerByGameStats?.homeTeam?.defense?.map((player, index) => (
             <View key={index}>
               <View style={styles.table}>
                 <Text style={[styles.cell, styles.nameCell]}>{player.name.default}</Text>

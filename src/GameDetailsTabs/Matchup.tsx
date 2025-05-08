@@ -1,6 +1,7 @@
 import {useEffect, useState} from 'react';
 import {Image, ScrollView, StyleSheet, Text, View} from 'react-native';
 import IonIcon from 'react-native-vector-icons/Ionicons';
+import Svg, {SvgUri} from 'react-native-svg';
 
 const Matchup = ({ game }) => {
   const[gameData, setGameData] = useState(null);
@@ -23,8 +24,6 @@ const Matchup = ({ game }) => {
   if(!gameData){
     return <Text>Loading details</Text>;
   }
-  // let home = 0;
-  // let away = 0;
 
   return (
     <ScrollView>
@@ -40,7 +39,7 @@ const Matchup = ({ game }) => {
       {/*    ))}*/}
       {/*  </View>*/}
       {/*))}*/}
-      {gameData.summary.threeStars.map((player, index) => (
+      {gameData.summary?.teamGameStats?.length > 0 && gameData.summary.threeStars.map((player, index) => (
         <View style={styles.entireStarBox}>
           <View style={styles.starBox}>
             <View style={styles.star}>
@@ -66,6 +65,32 @@ const Matchup = ({ game }) => {
           </View>
         </View>
       ))}
+      <View style={styles.teamStatsHeader}>
+        <Text>Team Stats</Text>
+        <View style={styles.teamStatsLogo}>
+          <SvgUri uri={gameData.homeTeam.logo} width={50} height={50}/>
+          <SvgUri uri={gameData.awayTeam.logo} width={50} height={50}/>
+        </View>
+      </View>
+      {gameData.summary?.teamGameStats?.length > 0 && gameData.summary.teamGameStats.map((game, index) => {
+        const total = game.homeValue + game.awayValue || 1;
+        const normalizedHome = game.homeValue / total;
+        const normalizedAway = game.awayValue / total;
+
+        return (
+          <View key={index} style={{marginBottom: 9, width: '100%'}}>
+            <Text style={{alignSelf: 'center'}}>{game.category}</Text>
+            <View style={{ flexDirection: 'row', height: 20, backgroundColor: '#ccc' }}>
+              <View style={{ flex: normalizedHome, backgroundColor: 'lightyellow' }}>
+                <Text>{game.homeValue}</Text>
+              </View>
+              <View style={{ flex: normalizedAway, backgroundColor: 'lightblue' }}>
+                <Text>{game.awayValue}</Text>
+              </View>
+            </View>
+          </View>
+        );
+      })}
     </ScrollView>
   );
 
@@ -98,6 +123,19 @@ const styles = StyleSheet.create({
   playerInfo: {
     width: '100%',
     marginLeft: 20,
+  },
+  teamStatsHeader: {
+    width: '100%',
+    justifyContent: 'center',
+    alignItems:'center',
+  },
+  teamStatsLogo: {
+    width: '100%',
+    flexDirection:'row',
+    justifyContent:'space-between',
+  },
+  statsBar:{
+    width: '100%',
   },
 });
 
